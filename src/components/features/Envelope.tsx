@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { grainTexture } from "@/lib/textures";
 
 interface EnvelopeProps {
     onOpen: () => void;
@@ -11,78 +11,67 @@ interface EnvelopeProps {
 export function Envelope({ onOpen }: EnvelopeProps) {
     const [isOpen, setIsOpen] = useState(false);
 
+    // We split the screen into two panels for a "Gate" opening effect
     const handleOpen = () => {
         if (isOpen) return;
         setIsOpen(true);
-        // Delay the actual "onOpen" callback to let animations play
         setTimeout(() => {
             onOpen();
-        }, 1500);
+        }, 1200);
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+            {/* Background/Underlay (visible as they open) - Warm off-white */}
+            <div className="absolute inset-0 bg-[#fdf8f6]" />
+
+            {/* LEFT PANEL */}
             <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative w-full max-w-md p-4"
-                onClick={handleOpen}
+                initial={{ x: 0 }}
+                animate={{ x: isOpen ? "-100%" : 0 }}
+                transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute left-0 top-0 h-full w-1/2 bg-[#f5ebe0] z-20 flex items-center justify-end border-r border-[#e6dace] shadow-lg"
             >
-                <div className="relative aspect-[4/3] w-full cursor-pointer perspective-1000 group">
-                    {/* Envelope Body */}
-                    <div className="absolute inset-0 z-10 flex items-end justify-center rounded-b-lg bg-[#f5ebe0] shadow-2xl overflow-hidden">
-                        {/* Text on Envelope */}
-                        <div className="mb-12 text-center opacity-80">
-                            <p className="font-serif text-2xl font-semibold tracking-widest text-[#4a3b32]">
-                                Ceren & Deniz Can
-                            </p>
-                            <p className="mt-2 text-sm uppercase tracking-widest text-[#8a3324]">
-                                Özel Davetiye
-                            </p>
-                        </div>
-                    </div>
+                <div className="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style={{ backgroundImage: grainTexture }}></div>
+            </motion.div>
 
-                    {/* Top Flap */}
-                    <motion.div
-                        initial={{ rotateX: 0 }}
-                        animate={{ rotateX: isOpen ? 180 : 0, zIndex: isOpen ? 0 : 20 }}
-                        transition={{ duration: 0.6, ease: "easeInOut" }}
-                        style={{ transformOrigin: "top" }}
-                        className="absolute top-0 left-0 z-20 h-1/2 w-full origin-top rounded-t-lg bg-[#e6dace] shadow-lg backface-hidden"
-                    >
-                        {/* Wax Seal */}
-                        <motion.div
-                            animate={{ opacity: isOpen ? 0 : 1 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute bottom-[-24px] left-1/2 flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full bg-[#8a3324] shadow-md border-4 border-[#7a2e20]"
-                        >
-                            <span className="font-serif text-2xl font-bold text-[#e6dace]">CD</span>
-                        </motion.div>
-                    </motion.div>
+            {/* RIGHT PANEL */}
+            <motion.div
+                initial={{ x: 0 }}
+                animate={{ x: isOpen ? "100%" : 0 }}
+                transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute right-0 top-0 h-full w-1/2 bg-[#f5ebe0] z-20 flex items-center justify-start border-l border-[#e6dace] shadow-lg"
+            >
+                <div className="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style={{ backgroundImage: grainTexture }}></div>
+            </motion.div>
 
-                    {/* Inner Content (Invitation Card) - Slides up/out */}
-                    <motion.div
-                        initial={{ y: 0 }}
-                        animate={{ y: isOpen ? -100 : 0, opacity: isOpen ? 1 : 0 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="absolute inset-x-4 bottom-4 z-0 h-[90%] rounded bg-white shadow-inner flex flex-col items-center justify-center text-center p-6"
-                    >
-                        <p className="font-serif text-xl italic text-gray-500">Davetlisiniz...</p>
-                    </motion.div>
+            {/* CONTENT LAYER (Centered Seal & Text) - Fades out as gates open */}
+            <motion.div
+                className="relative z-30 flex flex-col items-center justify-center cursor-pointer group"
+                onClick={handleOpen}
+                animate={{ opacity: isOpen ? 0 : 1, scale: isOpen ? 1.05 : 1, pointerEvents: isOpen ? "none" : "auto" }}
+                transition={{ duration: 0.8 }}
+            >
+                {/* Seal */}
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="relative flex h-24 w-24 md:h-32 md:w-32 items-center justify-center rounded-full bg-[#8a3324] shadow-2xl border-[6px] border-[#7a2e20]"
+                >
+                    <span className="font-script text-5xl md:text-6xl text-[#e6dace]">CD</span>
+                    {/* Wax texture overlay */}
+                    <div className="absolute inset-0 rounded-full opacity-30 mix-blend-overlay"
+                        style={{ backgroundImage: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent)` }}
+                    />
+                </motion.div>
 
+                <div className="mt-16 text-center">
+                    <h1 className="font-script text-6xl md:text-[7rem] text-[#4a3b32] tracking-wide font-normal leading-tight">
+                        Ceren & Deniz Can
+                    </h1>
+                    <p className="mt-8 font-sans text-xs md:text-xs uppercase tracking-[0.4em] text-[#8a3324] transition-all duration-700 ease-out group-hover:tracking-[0.5em] opacity-80">
+                        Davetiyeyi Açmak İçin Dokunun
+                    </p>
                 </div>
-
-                {!isOpen && (
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-                        className="mt-8 text-center font-sans text-white/80 tracking-widest uppercase text-sm"
-                    >
-                        Açmak için dokunun
-                    </motion.p>
-                )}
             </motion.div>
         </div>
     );

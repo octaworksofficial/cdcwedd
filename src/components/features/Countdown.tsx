@@ -36,7 +36,7 @@ export function Countdown() {
 
     return (
         <section className="py-20 px-6 text-center bg-[#f5ebe0]/30">
-            <h2 className="mb-12 font-serif text-3xl md:text-4xl text-[#4a3b32]">Büyük Güne Kalan</h2>
+            <h2 className="mb-12 font-serif text-3xl md:text-4xl text-[#4a3b32]">Biz Olmaya...</h2>
 
             <div className="flex flex-wrap justify-center gap-6 md:gap-12">
                 <TimeUnit value={timeLeft.days} label="Gün" />

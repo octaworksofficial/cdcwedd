@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import { Playfair_Display, Montserrat, Alex_Brush } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const cormorant = Cormorant_Garamond({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-cormorant",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+});
+
+const alexBrush = Alex_Brush({
+  subsets: ["latin"],
+  variable: "--font-alex-brush",
+  weight: ["400"],
   display: "swap",
 });
 
@@ -32,8 +40,9 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          cormorant.variable,
-          montserrat.variable
+          playfair.variable,
+          montserrat.variable,
+          alexBrush.variable
         )}
       >
         {children}

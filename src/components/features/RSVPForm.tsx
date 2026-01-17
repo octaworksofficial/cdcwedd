@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export function RSVPForm() {
     const [loading, setLoading] = useState(false);
@@ -11,7 +11,6 @@ export function RSVPForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate API call
         setTimeout(() => {
             setLoading(false);
             setSuccess(true);
@@ -19,69 +18,84 @@ export function RSVPForm() {
     };
 
     return (
-        <section className="py-24 px-6 bg-[#f5ebe0]">
-            <div className="max-w-md mx-auto rounded-2xl bg-white p-8 md:p-12 shadow-xl">
-                <h2 className="mb-2 text-center font-serif text-3xl md:text-4xl text-[#4a3b32]">LCV</h2>
-                <p className="mb-8 text-center font-sans text-sm text-gray-500">Lütfen 1 Şubat 2026'ya kadar dönüş yapınız.</p>
+        <section className="py-32 px-6 bg-[#f5ebe0]/30 border-y border-[#e6dace]">
+            <div className="max-w-lg mx-auto">
+                <div className="text-center mb-12">
+                    <h2 className="font-serif text-3xl md:text-5xl font-light text-[#4a3b32] mb-4">LCV</h2>
+                    <p className="font-sans text-xs uppercase tracking-[0.2em] text-[#8a3324]">Lütfen 1 Şubat'a kadar bildirin</p>
+                </div>
 
                 {success ? (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center justify-center py-12 text-center"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-12"
                     >
-                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">
-                            <Check size={32} />
-                        </div>
-                        <h3 className="mb-2 font-serif text-2xl text-[#4a3b32]">Teşekkürler!</h3>
-                        <p className="text-gray-600">Katılım durumunuz bize ulaştı.</p>
+                        <h3 className="font-serif text-2xl text-[#4a3b32] mb-2">Teşekkürler</h3>
+                        <p className="font-sans text-sm text-gray-500 tracking-wider">Katılım durumunuz kaydedildi.</p>
                     </motion.div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label htmlFor="name" className="mb-2 block font-sans text-xs font-bold uppercase tracking-wider text-gray-500">Ad Soyad</label>
+                    <form onSubmit={handleSubmit} className="space-y-12">
+                        <div className="relative">
                             <input
                                 type="text"
                                 id="name"
                                 required
-                                className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 font-serif text-[#4a3b32] focus:border-[#8a3324] focus:outline-none focus:ring-1 focus:ring-[#8a3324]"
-                                placeholder="İsim ve Soyisim"
+                                className="peer w-full bg-transparent border-b border-[#4a3b32]/20 py-3 font-serif text-xl text-[#4a3b32] placeholder-transparent focus:border-[#8a3324] focus:outline-none transition-colors"
+                                placeholder="Ad Soyad"
                             />
+                            <label
+                                htmlFor="name"
+                                className="absolute left-0 -top-3.5 font-sans text-xs font-bold uppercase tracking-widest text-gray-400 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-[#8a3324]"
+                            >
+                                Ad Soyad
+                            </label>
                         </div>
 
-                        <div>
-                            <label className="mb-2 block font-sans text-xs font-bold uppercase tracking-wider text-gray-500">Katılım Durumu</label>
-                            <div className="flex gap-4">
-                                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border border-gray-200 p-3 hover:bg-gray-50 has-[:checked]:border-[#8a3324] has-[:checked]:bg-[#8a3324]/5 has-[:checked]:text-[#8a3324]">
-                                    <input type="radio" name="attending" value="yes" className="hidden" required />
-                                    <span className="font-sans text-sm font-medium">Katılıyorum</span>
+                        <div className="space-y-4">
+                            <span className="block font-sans text-xs font-bold uppercase tracking-widest text-gray-400">Katılım Durumu</span>
+                            <div className="flex gap-8">
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center justify-center w-5 h-5 border border-[#4a3b32]/30 rounded-full transition-colors group-hover:border-[#8a3324]">
+                                        <input type="radio" name="attending" value="yes" className="peer appearance-none" required />
+                                        <div className="w-2.5 h-2.5 bg-[#8a3324] rounded-full scale-0 transition-transform peer-checked:scale-100" />
+                                    </div>
+                                    <span className="font-serif text-lg text-[#4a3b32]">Katılıyorum</span>
                                 </label>
-                                <label className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border border-gray-200 p-3 hover:bg-gray-50 has-[:checked]:border-[#8a3324] has-[:checked]:bg-[#8a3324]/5 has-[:checked]:text-[#8a3324]">
-                                    <input type="radio" name="attending" value="no" className="hidden" />
-                                    <span className="font-sans text-sm font-medium">Katılamıyorum</span>
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center justify-center w-5 h-5 border border-[#4a3b32]/30 rounded-full transition-colors group-hover:border-[#8a3324]">
+                                        <input type="radio" name="attending" value="no" className="peer appearance-none" />
+                                        <div className="w-2.5 h-2.5 bg-[#8a3324] rounded-full scale-0 transition-transform peer-checked:scale-100" />
+                                    </div>
+                                    <span className="font-serif text-lg text-[#4a3b32]">Maalesef</span>
                                 </label>
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="guests" className="mb-2 block font-sans text-xs font-bold uppercase tracking-wider text-gray-500">Kişi Sayısı</label>
+                        <div className="relative">
                             <select
                                 id="guests"
-                                className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 font-serif text-[#4a3b32] focus:border-[#8a3324] focus:outline-none focus:ring-1 focus:ring-[#8a3324]"
+                                className="peer w-full bg-transparent border-b border-[#4a3b32]/20 py-3 font-serif text-xl text-[#4a3b32] focus:border-[#8a3324] focus:outline-none appearance-none rounded-none"
                             >
                                 <option value="1">1 Kişi</option>
                                 <option value="2">2 Kişi</option>
                                 <option value="3">3 Kişi</option>
                                 <option value="4">4 Kişi</option>
                             </select>
+                            <label
+                                htmlFor="guests"
+                                className="absolute left-0 -top-3.5 font-sans text-xs font-bold uppercase tracking-widest text-gray-400"
+                            >
+                                Kişi Sayısı
+                            </label>
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex w-full items-center justify-center rounded-lg bg-[#8a3324] py-4 font-sans text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#7a2e20] disabled:bg-gray-400"
+                            className="w-full bg-[#4a3b32] py-4 font-sans text-xs font-bold uppercase tracking-[0.2em] text-[#f5ebe0] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                         >
-                            {loading ? <Loader2 className="animate-spin" /> : "Gönder"}
+                            {loading ? <Loader2 className="animate-spin mx-auto" /> : "GÖNDER"}
                         </button>
                     </form>
                 )}
