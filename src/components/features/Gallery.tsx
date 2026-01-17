@@ -22,6 +22,11 @@ export function Gallery() {
     const [isUploading, setIsUploading] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
     // Upload Form State
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -33,18 +38,36 @@ export function Gallery() {
 
     // Fetch images on mount
     useEffect(() => {
-        fetchImages();
+        fetchImages(1, true);
     }, []);
 
-    const fetchImages = async () => {
+    const fetchImages = async (pageNum: number, reset: boolean = false) => {
         try {
-            const res = await fetch("/api/images");
+            if (pageNum === 1) setIsLoading(true);
+            else setIsLoadingMore(true);
+
+            const res = await fetch(`/api/images?page=${pageNum}&limit=12`);
             const data = await res.json();
-            setImages(data.images || []);
+
+            if (reset) {
+                setImages(data.images || []);
+            } else {
+                setImages(prev => [...prev, ...data.images]);
+            }
+
+            setHasMore(data.hasMore);
+            setPage(pageNum);
         } catch (error) {
             console.error("Failed to fetch images:", error);
         } finally {
             setIsLoading(false);
+            setIsLoadingMore(false);
+        }
+    };
+
+    const loadMore = () => {
+        if (!isLoadingMore && hasMore) {
+            fetchImages(page + 1);
         }
     };
 
@@ -115,7 +138,8 @@ export function Gallery() {
             });
 
             if (res.ok) {
-                await fetchImages();
+                // Reset and fetch first page to show new image
+                await fetchImages(1, true);
                 toast.success("Fotoğrafınız başarıyla yüklendi! Güzel anılarınız için teşekkürler. ✨");
                 closeModal();
             } else {
@@ -189,44 +213,62 @@ export function Gallery() {
                 </motion.div>
 
                 {/* Gallery Grid */}
-                {isLoading ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="animate-spin text-[#8a3324]" size={32} />
-                    </div>
-                ) : images.length > 0 ? (
-                    <div className="columns-1 md:columns-3 lg:columns-4 gap-4 space-y-4">
-                        {images.map((img, i) => (
-                            <motion.div
-                                key={img.id}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.05 }}
-                                onClick={() => setSelectedImage(img)}
-                                className="break-inside-avoid relative rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
-                            >
-                                <div className="relative aspect-[3/4] w-full">
-                                    {/* Using aspect ratio for masonry look if desired, or auto height */}
+                {images.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {images.map((img, i) => (
+                                <motion.div
+                                    key={img.id}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.1 }}
+                                    onClick={() => setSelectedImage(img)}
+                                    className="relative aspect-square rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                                    layout
+                                >
                                     <Image
                                         src={img.url}
                                         alt={`Uploaded by ${img.uploader}`}
-                                        width={500}
-                                        height={500}
-                                        className="w-full h-auto object-cover"
+                                        fill
+                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                                     />
-                                </div>
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
-                                    <span className="flex items-center gap-2 font-medium bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                                        <Upload size={16} />
-                                        İncele
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                ) : (
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white z-10">
+                                        <span className="flex items-center gap-2 font-medium bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                                            <Upload size={16} />
+                                            İncele
+                                        </span>
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                        <p className="font-serif text-sm truncate">{img.uploader}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {hasMore && (
+                            <div className="mt-12">
+                                <button
+                                    onClick={loadMore}
+                                    disabled={isLoadingMore}
+                                    className="px-8 py-3 bg-white border border-[#8a3324]/30 text-[#8a3324] rounded-full hover:bg-[#8a3324] hover:text-white transition-all disabled:opacity-50 flex items-center gap-2 mx-auto"
+                                >
+                                    {isLoadingMore ? <Loader2 className="animate-spin" size={20} /> : <Plus size={20} />}
+                                    {isLoadingMore ? "Yükleniyor..." : "Daha Fazla Gör göster"}
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : !isLoading && (
                     <div className="py-12 text-[#4a3b32]/60">
                         <p>Henüz fotoğraf yok. İlk paylaşan siz olun!</p>
+                    </div>
+                )}
+
+                {isLoading && images.length === 0 && (
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="animate-spin text-[#8a3324]" size={32} />
                     </div>
                 )}
             </div>
