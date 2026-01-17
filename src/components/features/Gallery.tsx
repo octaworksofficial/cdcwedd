@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Loader2, X, Plus, Download, Calendar, User, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import heic2any from "heic2any";
+
 
 interface GalleryImage {
     id: number;
@@ -56,6 +56,7 @@ export function Gallery() {
                 setIsProcessing(true);
                 toast.info("HEIC formatı dönüştürülüyor, lütfen bekleyin...");
                 try {
+                    const heic2any = (await import("heic2any")).default;
                     const convertedBlob = await heic2any({
                         blob: file,
                         toType: "image/jpeg",
