@@ -1,33 +1,31 @@
 import { NextResponse } from "next/server";
-import { getStoragePath } from "@/lib/storage";
-import fs from "fs";
+import pool from "@/lib/db";
 
 export async function GET() {
     try {
-        const storageDir = getStoragePath();
+        const client = await pool.connect();
+        try {
+            // Fetch photos ordered by creation time descending
+            const result = await client.query(
+                "SELECT * FROM photos ORDER BY created_at DESC"
+            );
 
-        // Read directory
-        const files = fs.readdirSync(storageDir);
+            // Transform keys to match frontend expectation (or update frontend to match DB)
+            const images = result.rows.map(row => ({
+                id: row.id,
+                filename: row.image_url.split('/').pop(), // Extract filename from URL for key usage if needed
+                url: row.image_url,
+                uploader: row.uploader_name,
+                note: row.note,
+                createdAt: row.created_at
+            }));
 
-        // Filter for image files (basic extension check)
-        const images = files.filter(file =>
-            /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
-        ).map(file => ({
-            filename: file,
-            url: `/api/images/${file}`
-        }));
-
-        // Sort by newest first (based on timestamp in filename if available, or fs stats)
-        // Since we prefixed with timestamp, reverse alphabetical sort works for "newest first" logic broadly
-        // Or we can use file stats.
-        const sortedImages = images.sort((a, b) => {
-            // Simple string sort descending assuming timestamp prefix
-            return b.filename.localeCompare(a.filename);
-        });
-
-        return NextResponse.json({ images: sortedImages });
+            return NextResponse.json({ images });
+        } finally {
+            client.release();
+        }
     } catch (error) {
-        console.error("Error listing images:", error);
+        console.error("Error listing images from DB:", error);
         return NextResponse.json({ images: [] });
     }
 }
