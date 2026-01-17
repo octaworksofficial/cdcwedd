@@ -27,29 +27,39 @@ export async function POST(request: Request) {
         const filename = `${timestamp}-${cleanName}`;
 
         // Save file to disk/volume
+        // Save file to disk/volume
+        console.log("Getting storage path...");
         const storageDir = getStoragePath();
+        console.log("Storage path:", storageDir);
+
         const filepath = path.join(storageDir, filename);
+        console.log("Writing file to:", filepath);
         await writeFile(filepath, buffer);
+        console.log("File written successfully.");
 
         // Get public URL
         const imageUrl = getPublicUrl(filename);
 
         // Insert into DB
+        console.log("Connecting to DB...");
         const client = await pool.connect();
         try {
+            console.log("Inserting record into DB...");
             await client.query(
                 "INSERT INTO photos (image_url, uploader_name, note) VALUES ($1, $2, $3)",
                 [imageUrl, name || "Misafir", note || ""]
             );
+            console.log("DB Insert successful.");
         } finally {
             client.release();
         }
 
         return NextResponse.json({ success: true, filename, url: imageUrl });
-    } catch (error) {
-        console.error("Error uploading file:", error);
+    } catch (error: any) {
+        console.error("Upload process failed:", error);
+        // Return specific error for debugging purposes
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: error.message || "Internal Server Error", details: error.toString() },
             { status: 500 }
         );
     }
