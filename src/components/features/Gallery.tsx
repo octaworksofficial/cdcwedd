@@ -362,7 +362,7 @@ export function Gallery() {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Image Section */}
-                            <div className="relative w-full md:w-2/3 h-[50vh] md:h-auto bg-black flex items-center justify-center">
+                            <div className="relative w-full md:w-2/3 h-[35vh] md:h-auto bg-black flex items-center justify-center shrink-0">
                                 <div className="relative w-full h-full">
                                     <Image
                                         src={selectedImage.url}
@@ -374,20 +374,20 @@ export function Gallery() {
                             </div>
 
                             {/* Info Section */}
-                            <div className="w-full md:w-1/3 p-6 md:p-8 flex flex-col bg-[#fdf8f6]">
-                                <div className="flex justify-between items-start mb-6">
+                            <div className="w-full md:w-1/3 p-4 md:p-8 flex flex-col bg-[#fdf8f6] min-h-0">
+                                <div className="flex justify-between items-start mb-4 md:mb-6 shrink-0">
                                     <h3 className="font-serif text-2xl text-[#4a3b32]">Detaylar</h3>
                                     <button
                                         onClick={() => setSelectedImage(null)}
-                                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                                        className="text-gray-400 hover:text-gray-600 transition-colors bg-white/50 p-1 rounded-full"
                                     >
                                         <X size={24} />
                                     </button>
                                 </div>
 
-                                <div className="space-y-6 flex-1 overflow-y-auto">
+                                <div className="space-y-4 md:space-y-6 flex-1 overflow-y-auto pr-2">
                                     <div className="flex items-start gap-3">
-                                        <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324]">
+                                        <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324] shrink-0">
                                             <User size={20} />
                                         </div>
                                         <div>
@@ -398,7 +398,7 @@ export function Gallery() {
 
                                     {selectedImage.note && (
                                         <div className="flex items-start gap-3">
-                                            <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324]">
+                                            <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324] shrink-0">
                                                 <MessageCircle size={20} />
                                             </div>
                                             <div>
@@ -409,7 +409,7 @@ export function Gallery() {
                                     )}
 
                                     <div className="flex items-start gap-3">
-                                        <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324]">
+                                        <div className="mt-1 p-2 bg-[#8a3324]/10 rounded-full text-[#8a3324] shrink-0">
                                             <Calendar size={20} />
                                         </div>
                                         <div>
@@ -427,10 +427,11 @@ export function Gallery() {
                                     </div>
                                 </div>
 
-                                <div className="mt-8 pt-6 border-t border-gray-200">
+                                <div className="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-200 shrink-0">
                                     <button
                                         onClick={() => downloadImage(selectedImage)}
-                                        className="w-full flex items-center justify-center gap-2 bg-[#8a3324] text-white py-3 rounded-lg hover:bg-[#722a1e] transition-colors"
+                                        className="w-full flex items-center justify-center gap-2 bg-[#8a3324] text-white py-3 rounded-lg hover:bg-[#722a1e] transition-colors shadow-lg active:scale-[0.98]"
+                                        type="button"
                                     >
                                         <Download size={20} />
                                         Fotoğrafı İndir
